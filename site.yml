@@ -5,12 +5,14 @@
   pre_tasks:
 
   - name: install updates (Oracle Linux)
+    tags: always
     dnf:
       update_only: yes
       update_cache: yes
     when: ansible_distribution == "OracleLinux"
 
   - name: install updates (Ubuntu)
+    tags: always
     apt:
       upgrade: dist
       update_cache: yes
@@ -21,6 +23,7 @@
   tasks:
 
   - name: install apache2 package and php in ubuntu
+    tags: apache, apache2, ubuntu
     apt:
       name:
         - apache2
@@ -29,6 +32,7 @@
     when: ansible_distribution == "Ubuntu"
 
   - name: install apache2 and php package in oracle linux
+    tags: httpd, apache, oraclelinux
     dnf:
       name:
         - httpd
@@ -36,17 +40,28 @@
       state: latest
     when: ansible_distribution == "OracleLinux"
 
+  - name: copy default html file to site
+    tags: httpd, apache, apache2
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
 - hosts: db_servers
   become: true
   tasks:
 
   - name: install mariadb package (OracleLinux)
+    tags: mariadb, db, oraclelinux
     dnf:
       name: mariadb
       state: latest
     when: ansible_distribution == "OracleLinux"
 
   - name: install mariadb package (Ubuntu)
+    tags: ubuntu, mariadb, db
     apt:
       name: mariadb_server
       state: latest
@@ -57,6 +72,7 @@
   tasks:
 
     - name: install samba package
+      tags: samba, file
       package:
         name: samba
         state: latest
